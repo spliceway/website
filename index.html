@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spliceway</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f9f8f6;
+    --white: #ffffff;
+    --dark: #1a1a2e;
+    --text: #3d3d4e;
+    --muted: #8888a0;
+    --border: #e8e6f0;
+    --grad-start: #e8336d;
+    --grad-end: #3b82f6;
+    --grad: linear-gradient(135deg, #e8336d, #a855f7, #3b82f6);
+    --grad-soft: linear-gradient(135deg, rgba(232,51,109,0.08), rgba(168,85,247,0.05), rgba(59,130,246,0.08));
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(249,248,246,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+    padding: 0 5%;
+  }
+  nav.scrolled { border-color: var(--border); }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 80px;
+  }
+  .nav-logo {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+  }
+  .nav-links {
+    list-style: none;
+    display: flex; gap: 36px; align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--dark); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+  }
+  .btn-primary {
+    background: var(--grad);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(168,85,247,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(168,85,247,0.35); }
+  .btn-outline {
+    background: transparent;
+    color: var(--dark);
+    border: 1.5px solid var(--border);
+  }
+  .btn-outline:hover { border-color: #a855f7; color: #a855f7; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 152px 5% 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-blob {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(232,51,109,0.07) 0%, rgba(168,85,247,0.05) 40%, transparent 70%);
+    border-radius: 50%;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 28px;
+    letter-spacing: 0.05em;
+  }
+  .hero-badge span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--grad);
+  }
+  .hero h1 {
+    font-size: clamp(2.6rem, 5.5vw, 5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--dark);
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 .gradient-text {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-desc {
+    max-width: 540px;
+    margin: 0 auto 40px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    font-weight: 500;
+    position: relative; z-index: 1;
+  }
+  .hero-cta {
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    position: relative; z-index: 1;
+    margin-bottom: 72px;
+  }
+  .btn-lg { padding: 14px 36px; font-size: 0.95rem; }
+
+  .hero-stats {
+    display: flex; gap: 0; justify-content: center;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-width: 640px;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+    position: relative; z-index: 1;
+  }
+  .hero-stat {
+    flex: 1;
+    padding: 24px 20px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat-num {
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── SECTIONS ── */
+  .section { padding: 100px 5%; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: clamp(1.9rem, 3.5vw, 3rem);
+    font-weight: 900;
+    color: var(--dark);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 500;
+    max-width: 480px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 24px;
+    border-radius: var(--radius);
+    transition: background 0.2s;
+    cursor: default;
+  }
+  .step:hover { background: var(--white); }
+  .step-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--grad-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+  }
+  .step h3 { font-size: 1rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+  .step p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+  .how-visual {
+    position: relative;
+    height: 440px;
+  }
+  .card-float {
+    position: absolute;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+  }
+  .card-main {
+    left: 0; top: 0; right: 40px; bottom: 60px;
+    background: linear-gradient(135deg, #fff 60%, rgba(168,85,247,0.04));
+    display: flex; flex-direction: column; justify-content: flex-end;
+    overflow: hidden;
+  }
+  .card-main::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(232,51,109,0.1), rgba(168,85,247,0.07), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .big-num {
+    font-size: 4.5rem;
+    font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .big-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .card-sm {
+    right: 0; bottom: 0;
+    width: 170px;
+    padding: 20px;
+  }
+  .sm-num { font-size: 2rem; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+  .sm-label { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.07em; }
+
+  /* ── SERVICES ── */
+  .services-bg { background: var(--white); }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 56px;
+  }
+  .service-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 30px;
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .service-card:hover {
+    background: var(--white);
+    box-shadow: 0 8px 32px rgba(168,85,247,0.1);
+    border-color: rgba(168,85,247,0.2);
+    transform: translateY(-4px);
+  }
+  .service-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--grad-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+  .service-card h3 { font-size: 1rem; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+  .service-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── SPLIT (Brands / Influencers) ── */
+  .split { display: flex; background: var(--bg); }
+  .split-half {
+    flex: 1;
+    padding: 100px 5%;
+  }
+  .split-half:first-child { border-right: 1px solid var(--border); }
+  .split-inner { max-width: 480px; margin: 0 auto; }
+  .split-half:last-child .split-inner { margin: 0 auto; }
+
+  .pill-tag {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--grad-soft);
+    border: 1px solid rgba(168,85,247,0.15);
+    color: #a855f7;
+    margin-bottom: 20px;
+  }
+  .feature-list { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .feature-list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 0.9rem; color: var(--text); font-weight: 500;
+  }
+  .feature-list li .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+    font-size: 0.65rem; color: #fff; font-weight: 900;
+  }
+  .split-half .btn { margin-top: 36px; }
+
+  /* ── TESTIMONIALS ── */
+  .testi-bg { background: var(--white); }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 56px;
+  }
+  .testi-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    transition: all 0.25s;
+  }
+  .testi-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.07); transform: translateY(-3px); }
+  .testi-stars { font-size: 0.85rem; margin-bottom: 16px; letter-spacing: 2px; }
+  .testi-text { font-size: 0.9rem; color: var(--text); line-height: 1.7; font-weight: 500; margin-bottom: 24px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .testi-name { font-weight: 800; font-size: 0.875rem; color: var(--dark); }
+  .testi-role { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+
+  /* ── PROCESS ── */
+  .process-row {
+    display: flex; gap: 0;
+    margin-top: 56px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .process-step {
+    flex: 1;
+    padding: 40px 28px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.2s;
+  }
+  .process-step:last-child { border-right: none; }
+  .process-step:hover { background: var(--bg); }
+  .process-num {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 14px;
+    opacity: 0.3;
+  }
+  .process-step h4 { font-size: 0.95rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+  .process-step p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; font-weight: 500; }
+
+  /* ── CTA ── */
+  .cta-section { padding: 100px 5%; }
+  .cta-box {
+    max-width: 1200px; margin: 0 auto;
+    background: var(--dark);
+    border-radius: 24px;
+    padding: 80px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(168,85,247,0.2), transparent 65%);
+  }
+  .cta-box::after {
+    content: '';
+    position: absolute; bottom: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(232,51,109,0.15), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cta-box .section-tag, .cta-box .section-title { position: relative; z-index: 1; }
+  .cta-box .section-tag { color: rgba(255,255,255,0.5); background: none; -webkit-text-fill-color: rgba(255,255,255,0.5); }
+  .cta-box .section-title { color: #fff; }
+  .cta-box p { color: rgba(255,255,255,0.5); font-weight: 500; font-size: 1rem; max-width: 420px; margin: 0 auto 40px; position: relative; z-index: 1; }
+  .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+  .btn-white { background: #fff; color: var(--dark); }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,255,255,0.2); }
+  .btn-ghost-white { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.2); }
+  .btn-ghost-white:hover { border-color: rgba(255,255,255,0.5); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 60px 5% 36px;
+  }
+  .footer-grid {
+    max-width: 1200px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 56px;
+    margin-bottom: 48px;
+  }
+  .footer-brand .footer-logo {
+    text-decoration: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .footer-brand img { height: 44px; margin-bottom: 14px; display: block; mix-blend-mode: multiply; }
+  .footer-wordmark {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+    display: inline-block;
+  }
+  .footer-brand p { font-size: 0.875rem; color: var(--muted); font-weight: 500; max-width: 240px; line-height: 1.65; }
+  .footer-col h5 {
+    font-size: 0.8rem; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--dark); margin-bottom: 18px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul a { text-decoration: none; color: var(--muted); font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+  .footer-col ul a:hover { color: var(--dark); }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-bottom p { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+  .footer-social { display: flex; gap: 16px; align-items: center; }
+  .footer-social a {
+    display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+    color: var(--muted); font-size: 0.8rem; font-weight: 600;
+    transition: color 0.2s;
+  }
+  .footer-social a:hover { color: var(--dark); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    .how-grid { grid-template-columns: 1fr; }
+    .how-visual { display: none; }
+    .services-grid { grid-template-columns: 1fr; }
+    .split { flex-direction: column; }
+    .split-half:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .testi-grid { grid-template-columns: 1fr; }
+    .process-row { flex-direction: column; }
+    .process-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .process-step:last-child { border-bottom: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .cta-box { padding: 56px 28px; }
+    .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    .hero-stats { flex-wrap: wrap; }
+    .hero-stat { min-width: 50%; }
+    .hero-stat:nth-child(2) { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Spliceway</a>
+    <ul class="nav-links">
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#brands">For Brands</a></li>
+      <li><a href="#creators">For Creators</a></li>
+      <li><a href="#contact" class="btn btn-primary" style="padding:10px 22px;font-size:0.85rem;">Get Started</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-blob"></div>
+  <div class="hero-badge"><span></span> Influencer Marketing Agency</div>
+  <h1>Where Brands<br>Meet <span class="gradient-text">Influence</span></h1>
+  <p class="hero-desc">Spliceway connects ambitious brands with the right creators for authentic, results-driven paid collaborations.</p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn btn-primary btn-lg">Start a Campaign</a>
+    <a href="#how" class="btn btn-outline btn-lg">How It Works</a>
+  </div>
+  <div class="hero-stats reveal">
+    <div class="hero-stat">
+      <div class="hero-stat-num">100+</div>
+      <div class="hero-stat-label">Vetted Creators</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">20+</div>
+      <div class="hero-stat-label">Brands Served</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">6×</div>
+      <div class="hero-stat-label">Average ROI</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">98%</div>
+      <div class="hero-stat-label">Satisfaction</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <div class="section-tag">The Process</div>
+    <h2 class="section-title reveal">Simple. Strategic.<br>Effective.</h2>
+    <p class="section-sub reveal">We handle everything — from discovery to reporting — so you can focus on what you do best.</p>
+    <div class="how-grid">
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-icon">🎯</div>
+          <div>
+            <h3>Brief & Discovery</h3>
+            <p>Share your goals, audience, and budget. We learn what makes your brand unique and define what success looks like.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-icon">🔍</div>
+          <div>
+            <h3>Influencer Matching</h3>
+            <p>We handpick creators whose audience, values, and aesthetic align with your brand — no guesswork, only strategic fits.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-icon">🚀</div>
+          <div>
+            <h3>Campaign Execution</h3>
+            <p>We manage contracts, briefs, timelines, and approvals so your campaign launches on time with zero stress.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-icon">📊</div>
+          <div>
+            <h3>Analytics & Reporting</h3>
+            <p>Get detailed performance reports on reach, engagement, conversions, and ROI — know exactly what your investment delivered.</p>
+          </div>
+        </div>
+      </div>
+      <div class="how-visual reveal">
+        <div class="card-float card-main">
+          <div class="big-num">12×</div>
+          <div class="big-label">Average Campaign ROI</div>
+        </div>
+        <div class="card-float card-sm">
+          <div class="sm-num">100+</div>
+          <div class="sm-label">Creators</div>
+          <div class="sm-num" style="margin-top:16px;">98%</div>
+          <div class="sm-label">Satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section services-bg" id="services">
+  <div class="section-inner">
+    <div class="section-tag">What We Offer</div>
+    <h2 class="section-title reveal">Full-Service<br>Influencer Solutions</h2>
+    <p class="section-sub reveal">Everything you need to run a successful influencer campaign — under one roof.</p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">🔎</div>
+        <h3>Influencer Discovery</h3>
+        <p>We source and vet creators across Instagram, YouTube, and TikTok — filtered by niche, demographics, and engagement quality.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🗂️</div>
+        <h3>Campaign Strategy</h3>
+        <p>Data-backed strategies aligned with your KPIs to ensure maximum impact and measurable results every time.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">✍️</div>
+        <h3>Content & Creative</h3>
+        <p>Thoughtful creative briefs that feel authentic to each creator's voice while hitting all your brand requirements.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📝</div>
+        <h3>Contracts & Negotiation</h3>
+        <p>We handle rates, usage rights, and legal agreements — protecting both brands and creators throughout.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📈</div>
+        <h3>Performance Analytics</h3>
+        <p>Track every metric that matters — impressions, engagement, conversions, and revenue — with clear, actionable reports.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🤝</div>
+        <h3>Long-Term Partnerships</h3>
+        <p>Build ambassador programs and ongoing creator relationships that keep your brand top-of-mind with loyal audiences.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR BRANDS / FOR CREATORS -->
+<div class="split" id="brands">
+  <div class="split-half">
+    <div class="split-inner">
+      <div class="pill-tag">For Brands</div>
+      <h2 class="section-title reveal">Reach the<br>Right Audience</h2>
+      <ul class="feature-list">
+        <li class="reveal"><div class="check">✓</div>Access 100+ pre-vetted influencers across all major niches</li>
+        <li class="reveal"><div class="check">✓</div>Data-driven matching based on your target demographics</li>
+        <li class="reveal"><div class="check">✓</div>Full campaign management — from brief to final report</li>
+        <li class="reveal"><div class="check">✓</div>Transparent pricing with no hidden fees</li>
+        <li class="reveal"><div class="check">✓</div>Dedicated account manager for every campaign</li>
+      </ul>
+      <a href="#contact" class="btn btn-primary">Partner With Us</a>
+    </div>
+  </div>
+  <div class="split-half" id="creators">
+    <div class="split-inner">
+      <div class="pill-tag">For Creators</div>
+      <h2 class="section-title reveal">Grow Your<br>Creator Career</h2>
+      <ul class="feature-list">
+        <li class="reveal"><div class="check">✓</div>Connect with premium brands that match your content and values</li>
+        <li class="reveal"><div class="check">✓</div>Competitive rates negotiated on your behalf — always fair pay</li>
+        <li class="reveal"><div class="check">✓</div>Clear briefs and simple onboarding every single time</li>
+        <li class="reveal"><div class="check">✓</div>Long-term ambassador opportunities, not just one-offs</li>
+        <li class="reveal"><div class="check">✓</div>Prompt payments and full contract transparency</li>
+      </ul>
+      <a href="#contact" class="btn btn-primary">Join Our Network</a>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<section class="section testi-bg">
+  <div class="section-inner">
+    <div class="section-tag">Kind Words</div>
+    <h2 class="section-title reveal">What Our Partners Say</h2>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Spliceway made brand collaborations effortless and perfectly aligned with my fitness audience. Their professionalism and campaign quality truly set them apart."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AS</div>
+          <div>
+            <div class="testi-name">Aarav Sharma</div>
+            <div class="testi-role">Fitness Creator</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"As a mid-tier creator, I always struggled with brand deals. Spliceway got me rates I never thought possible and paired me with brands that actually fit my audience."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">RV</div>
+          <div>
+            <div class="testi-name">Rahul Verma</div>
+            <div class="testi-role">Lifestyle Creator</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Clear contracts, on-time delivery, and a team that genuinely cares about results. Spliceway is the only influencer agency we'll ever work with again."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">PM</div>
+          <div>
+            <div class="testi-name">Priya Mehta</div>
+            <div class="testi-role">Cosmetic Brand Owner</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" style="background: var(--bg);">
+  <div class="section-inner">
+    <div class="section-tag">Timeline</div>
+    <h2 class="section-title reveal">Launch in Days, Not Months</h2>
+    <div class="process-row reveal">
+      <div class="process-step">
+        <div class="process-num">01</div>
+        <h4>Brief Call</h4>
+        <p>30-min discovery to understand your goals and brand voice</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">02</div>
+        <h4>Proposal</h4>
+        <p>Custom strategy and creator shortlist within 48 hours</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">03</div>
+        <h4>Approval</h4>
+        <p>Review and approve creators and creative direction</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">04</div>
+        <h4>Go Live</h4>
+        <p>Campaign launches — we manage every detail for you</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">05</div>
+        <h4>Report</h4>
+        <p>Full analytics report with insights and next steps</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-box">
+    <div class="section-tag">Let's Work Together</div>
+    <h2 class="section-title reveal" style="color:#fff;">Ready to Get Started?</h2>
+    <p class="reveal">Whether you're a brand ready to scale or a creator looking for premium partnerships — we'd love to hear from you.</p>
+    <div class="cta-buttons reveal">
+      <a href="mailto:business@spliceway.com" class="btn btn-white btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        business@spliceway.com
+      </a>
+      <a href="https://instagram.com/spliceway" target="_blank" class="btn btn-ghost-white btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        @spliceway
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-wordmark">Spliceway</div>
+      <p>The influencer marketing agency that connects brands with creators for authentic, high-performance paid collaborations.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#brands">For Brands</a></li>
+        <li><a href="#creators">For Creators</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Connect</h5>
+      <ul>
+        <li><a href="mailto:business@spliceway.com">Email Us</a></li>
+        <li><a href="https://instagram.com/spliceway" target="_blank">Instagram</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="mailto:business@spliceway.com">business@spliceway.com</a></li>
+        <li><a href="https://instagram.com/spliceway" target="_blank">@spliceway</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Spliceway. All rights reserved.</p>
+    <div class="footer-social">
+      <a href="mailto:business@spliceway.com">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        business@spliceway.com
+      </a>
+      <a href="https://instagram.com/spliceway" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        @spliceway
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('in'), i * 70);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Counter animation
+  function count(el, target, suffix) {
+    let start = null;
+    const step = ts => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / 1600, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.floor(ease * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  const statsObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.hero-stat-num').forEach(el => {
+          const t = el.textContent;
+          const v = parseInt(t);
+          const s = t.replace(/[0-9]/g, '');
+          if (!isNaN(v)) count(el, v, s);
+        });
+        statsObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.hero-stats').forEach(el => statsObserver.observe(el));
+</script>
+</body>
+</html>
